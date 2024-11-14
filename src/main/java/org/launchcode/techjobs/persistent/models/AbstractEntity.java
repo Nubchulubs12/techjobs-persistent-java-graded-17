@@ -18,7 +18,7 @@ public abstract class AbstractEntity {
 
 @NotBlank(message = "You can't leave this blank.")
 @Size(min = 3, max = 80, message = "You must have at least 3 characters in this field.")
-    private String name;
+    public String name;
 
 
 

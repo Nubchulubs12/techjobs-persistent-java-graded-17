@@ -1,7 +1,13 @@
 package org.launchcode.techjobs.persistent.controllers;
 
 import jakarta.validation.Valid;
+import org.launchcode.techjobs.persistent.models.Employer;
 import org.launchcode.techjobs.persistent.models.Job;
+import org.launchcode.techjobs.persistent.models.Skill;
+import org.launchcode.techjobs.persistent.models.data.EmployerRepository;
+import org.launchcode.techjobs.persistent.models.data.JobRepository;
+import org.launchcode.techjobs.persistent.models.data.SkillRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -17,6 +23,13 @@ import java.util.Optional;
 @Controller
 public class HomeController {
 
+    @Autowired
+    public EmployerRepository employerRepository;
+    @Autowired
+    public JobRepository jobRepository;
+    @Autowired
+    public SkillRepository skillRepository;
+
     @RequestMapping("/")
     public String index(Model model) {
 
@@ -29,18 +42,33 @@ public class HomeController {
     public String displayAddJobForm(Model model) {
 	model.addAttribute("title", "Add Job");
         model.addAttribute(new Job());
+        model.addAttribute("employers", employerRepository.findAll());
+
         return "add";
     }
 
     @PostMapping("add")
     public String processAddJobForm(@ModelAttribute @Valid Job newJob,
-                                       Errors errors, Model model, @RequestParam int employerId) {
-
+                                       Errors errors, Model model, @RequestParam int employerId, @RequestParam List<Integer> skills) {
+        List<Skill> skillObjs = (List<Skill>) skillRepository.findAllById(skills);
+        newJob.setSkills(skillObjs);
+        model.addAttribute("employers", employerRepository.findAll());
         if (errors.hasErrors()) {
 	    model.addAttribute("title", "Add Job");
+
             return "add";
         }
 
+        Optional<Employer> employer = employerRepository.findById(employerId);
+
+        if (employer.isPresent()){
+            newJob.setEmployer(employer.get());
+        } else {
+            return "add";
+        }
+
+        newJob.setSkills(skillObjs);
+        jobRepository.save(newJob);
         return "redirect:";
     }
 
