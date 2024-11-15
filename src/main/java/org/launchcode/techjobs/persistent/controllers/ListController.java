@@ -49,8 +49,7 @@ public class ListController {
         model.addAttribute("employers", employerRepository.findAll());
         model.addAttribute("skills", skillRepository.findAll());
 
-        List<Employer> employers = (List<Employer>) employerRepository.findAll();
-        List<Skill> skills = (List<Skill>) skillRepository.findAll();
+
         return "list";
     }
 
