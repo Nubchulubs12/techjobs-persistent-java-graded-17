@@ -13,7 +13,6 @@ import java.util.List;
 public class Skill extends AbstractEntity {
 
     @ManyToMany(mappedBy = "skills")
-
     private List<Job> jobs = new ArrayList<>();
 
     @NotBlank(message = "You can't leave this blank.")
@@ -21,11 +20,12 @@ public class Skill extends AbstractEntity {
     private String description;
 
 
-    public Skill() {}
-public Skill(String description) {
+    public Skill(String description) {
         this.description = description;
-//        this.jobs = jobs;
-}
+
+    }
+    public Skill() {}
+
     public List<Job> getJobs() {
         return jobs;
     }

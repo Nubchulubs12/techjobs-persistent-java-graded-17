@@ -40,7 +40,7 @@ public class HomeController {
 
     @GetMapping("add")
     public String displayAddJobForm(Model model) {
-	model.addAttribute("title", "Add Job");
+        model.addAttribute("title", "Add Job");
         model.addAttribute(new Job());
         model.addAttribute("employers", employerRepository.findAll());
         model.addAttribute("skills", skillRepository.findAll());
@@ -50,27 +50,26 @@ public class HomeController {
 
     @PostMapping("add")
     public String processAddJobForm(@ModelAttribute @Valid Job newJob,
-                                       Errors errors, Model model, @RequestParam int employerId, @RequestParam List<Integer> skills) {
-        List<Skill> skillObjs = (List<Skill>) skillRepository.findAllById(skills);
-        newJob.setSkills(skillObjs);
-        model.addAttribute("employers", employerRepository.findAll());
+                                    Errors errors, Model model, @RequestParam int employerId, @RequestParam List<Integer> skills) {
+
+
         if (errors.hasErrors()) {
-	    model.addAttribute("title", "Add Job");
-
+            model.addAttribute("title", "Add Job");
             return "add";
-        }
 
-        Optional<Employer> employer = employerRepository.findById(employerId);
-
-        if (employer.isPresent()){
-            newJob.setEmployer(employer.get());
         } else {
-            return "add";
+            Optional<Employer> optEmployer = employerRepository.findById(employerId);
+            if (optEmployer.isPresent()) {
+                Employer employer = optEmployer.get();
+                newJob.setEmployer(employer);
+            }
+            List<Skill> skillObjs = (List<Skill>) skillRepository.findAllById(skills);
+            newJob.setSkills(skillObjs);
+            jobRepository.save(newJob);
+            return "redirect:";
         }
 
-        newJob.setSkills(skillObjs);
-        jobRepository.save(newJob);
-        return "redirect:";
+
     }
 
     @GetMapping("view/{jobId}")
@@ -80,7 +79,7 @@ public class HomeController {
             Job job = optJob.get();
             model.addAttribute("job", job);
         }
-            return "view";
+        return "view";
     }
 
 }
